@@ -26,11 +26,6 @@ export async function setup2FAAction(_prev: ActionResult, formData: FormData): P
 			message: "Forbidden"
 		};
 	}
-	if (user.registeredTOTP) {
-		return {
-			message: "Forbidden"
-		};
-	}
 	if (!totpUpdateBucket.check(user.id, 1)) {
 		return {
 			message: "Too many requests"

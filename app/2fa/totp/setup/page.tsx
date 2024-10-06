@@ -18,9 +18,6 @@ export default function Page() {
 	if (user.registered2FA && !session.twoFactorVerified) {
 		return redirect(get2FARedirect(user));
 	}
-	if (user.registeredTOTP) {
-		return redirect("/");
-	}
 
 	const totpKey = new Uint8Array(20);
 	crypto.getRandomValues(totpKey);
