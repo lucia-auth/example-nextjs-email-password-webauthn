@@ -26,6 +26,7 @@ export default function Page() {
 	return (
 		<>
 			<h1>Authenticate with authenticator app</h1>
+			<p>Enter the code from your app.</p>
 			<PasswordResetTOTPForm />
 			<Link href="/reset-password/2fa/recovery-code">Use recovery code</Link>
 			{user.registeredSecurityKey && <Link href="/reset-password/2fa/security-key">Use security keys</Link>}

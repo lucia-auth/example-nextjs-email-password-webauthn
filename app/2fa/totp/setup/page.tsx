@@ -26,7 +26,7 @@ export default function Page() {
 	const qrcode = renderSVG(keyURI);
 	return (
 		<>
-			<h1>Set up two-factor authentication</h1>
+			<h1>Set up authenticator app</h1>
 			<div
 				style={{
 					width: "200px",

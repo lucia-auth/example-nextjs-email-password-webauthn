@@ -21,6 +21,7 @@ export default function Page() {
 	return (
 		<>
 			<h1>Authenticate with authenticator app</h1>
+			<p>Enter the code from your app.</p>
 			<TwoFactorVerificationForm />
 			<Link href="/2fa/reset">Use recovery code</Link>
 			{user.registeredPasskey && <Link href="/2fa/passkey">Use passkeys</Link>}
