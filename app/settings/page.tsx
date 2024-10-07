@@ -14,8 +14,13 @@ import { getUserRecoverCode } from "@/lib/server/user";
 import { get2FARedirect } from "@/lib/server/2fa";
 import { getUserPasskeyCredentials, getUserSecurityKeyCredentials } from "@/lib/server/webauthn";
 import { encodeBase64 } from "@oslojs/encoding";
+import { globalGETRateLimit } from "@/lib/server/request";
 
 export default function Page() {
+	if (!globalGETRateLimit()) {
+		return "Too many requests";
+	}
+
 	const { session, user } = getCurrentSession();
 	if (session === null) {
 		return redirect("/login");

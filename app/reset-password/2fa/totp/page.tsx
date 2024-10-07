@@ -4,8 +4,13 @@ import { PasswordResetTOTPForm } from "./components";
 import { getCurrentPasswordResetSession } from "@/lib/server/password-reset";
 import { redirect } from "next/navigation";
 import { getPasswordReset2FARedirect } from "@/lib/server/2fa";
+import { globalGETRateLimit } from "@/lib/server/request";
 
 export default function Page() {
+	if (!globalGETRateLimit()) {
+		return "Too many requests";
+	}
+
 	const { session, user } = getCurrentPasswordResetSession();
 
 	if (session === null) {

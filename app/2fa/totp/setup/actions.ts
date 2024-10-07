@@ -6,10 +6,17 @@ import { updateUserTOTPKey } from "@/lib/server/totp";
 import { decodeBase64 } from "@oslojs/encoding";
 import { verifyTOTP } from "@oslojs/otp";
 import { redirect } from "next/navigation";
+import { globalPOSTRateLimit } from "@/lib/server/request";
 
 const totpUpdateBucket = new RefillingTokenBucket<number>(3, 60 * 10);
 
 export async function setup2FAAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+	if (!globalPOSTRateLimit()) {
+		return {
+			message: "Too many requests"
+		};
+	}
+
 	const { session, user } = getCurrentSession();
 	if (session === null) {
 		return {

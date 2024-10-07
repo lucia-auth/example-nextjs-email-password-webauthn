@@ -18,15 +18,22 @@ import {
 } from "@/lib/server/email-verification";
 import { checkEmailAvailability, verifyEmailInput } from "@/lib/server/email";
 import { redirect } from "next/navigation";
-
-import type { SessionFlags } from "@/lib/server/session";
 import { deleteUserTOTPKey, totpUpdateBucket } from "@/lib/server/totp";
 import { decodeBase64 } from "@oslojs/encoding";
 import { deleteUserPasskeyCredential, deleteUserSecurityKeyCredential } from "@/lib/server/webauthn";
+import { globalPOSTRateLimit } from "@/lib/server/request";
+
+import type { SessionFlags } from "@/lib/server/session";
 
 const passwordUpdateBucket = new ExpiringTokenBucket<string>(5, 60 * 30);
 
 export async function updatePasswordAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+	if (!globalPOSTRateLimit()) {
+		return {
+			message: "Too many requests"
+		};
+	}
+
 	const { session, user } = getCurrentSession();
 	if (session === null) {
 		return {
@@ -85,6 +92,12 @@ export async function updatePasswordAction(_prev: ActionResult, formData: FormDa
 }
 
 export async function updateEmailAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+	if (!globalPOSTRateLimit()) {
+		return {
+			message: "Too many requests"
+		};
+	}
+
 	const { session, user } = getCurrentSession();
 	if (session === null) {
 		return {
@@ -134,6 +147,12 @@ export async function updateEmailAction(_prev: ActionResult, formData: FormData)
 }
 
 export async function disconnectTOTPAction(): Promise<ActionResult> {
+	if (!globalPOSTRateLimit()) {
+		return {
+			message: "Too many requests"
+		};
+	}
+
 	const { session, user } = getCurrentSession();
 	if (session === null || user === null) {
 		return {
@@ -162,6 +181,12 @@ export async function disconnectTOTPAction(): Promise<ActionResult> {
 }
 
 export async function deletePasskeyAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+	if (!globalPOSTRateLimit()) {
+		return {
+			message: "Too many requests"
+		};
+	}
+
 	const { session, user } = getCurrentSession();
 	if (session === null || user === null) {
 		return {
@@ -204,6 +229,12 @@ export async function deletePasskeyAction(_prev: ActionResult, formData: FormDat
 }
 
 export async function deleteSecurityKeyAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+	if (!globalPOSTRateLimit()) {
+		return {
+			message: "Too many requests"
+		};
+	}
+
 	const { session, user } = getCurrentSession();
 	if (session === null || user === null) {
 		return {
@@ -247,6 +278,13 @@ export async function deleteSecurityKeyAction(_prev: ActionResult, formData: For
 }
 
 export async function regenerateRecoveryCodeAction(): Promise<RegenerateRecoveryCodeActionResult> {
+	if (!globalPOSTRateLimit()) {
+		return {
+			error: "Too many requests",
+			recoveryCode: null
+		};
+	}
+
 	const { session, user } = getCurrentSession();
 	if (session === null || user === null) {
 		return {

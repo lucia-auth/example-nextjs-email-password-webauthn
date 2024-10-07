@@ -7,7 +7,6 @@ import { useFormState } from "react-dom";
 import { registerSecurityKeyAction } from "./actions";
 
 import type { User } from "@/lib/server/user";
-import type { WebAuthnUserCredential } from "@/lib/server/webauthn";
 
 const initialRegisterSecurityKeyState = {
 	message: ""

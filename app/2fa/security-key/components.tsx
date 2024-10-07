@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export function Verify2FAWithSecurityKeyButton(props: { encodedCredentialIds: string[] }) {
-	const router = useRouter()
+	const router = useRouter();
 	const [message, setMessage] = useState("");
 	return (
 		<div>

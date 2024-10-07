@@ -1,16 +1,20 @@
 "use server";
 
-import {
-	setPasswordResetSessionAsEmailVerified,
-	getCurrentPasswordResetSession
-} from "@/lib/server/password-reset";
+import { setPasswordResetSessionAsEmailVerified, getCurrentPasswordResetSession } from "@/lib/server/password-reset";
 import { ExpiringTokenBucket } from "@/lib/server/rate-limit";
 import { setUserAsEmailVerifiedIfEmailMatches } from "@/lib/server/user";
 import { redirect } from "next/navigation";
+import { globalPOSTRateLimit } from "@/lib/server/request";
 
 const emailVerificationBucket = new ExpiringTokenBucket<number>(5, 60 * 30);
 
 export async function verifyPasswordResetEmailAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+	if (!globalPOSTRateLimit()) {
+		return {
+			message: "Too many requests"
+		};
+	}
+
 	const { session } = getCurrentPasswordResetSession();
 	if (session === null) {
 		return {

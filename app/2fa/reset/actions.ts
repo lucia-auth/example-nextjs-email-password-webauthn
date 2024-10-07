@@ -2,10 +2,16 @@
 
 import { recoveryCodeBucket, resetUser2FAWithRecoveryCode } from "@/lib/server/2fa";
 import { getCurrentSession } from "@/lib/server/session";
-
+import { globalPOSTRateLimit } from "@/lib/server/request";
 import { redirect } from "next/navigation";
 
 export async function reset2FAAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+	if (!globalPOSTRateLimit()) {
+		return {
+			message: "Too many requests"
+		};
+	}
+
 	const { session, user } = getCurrentSession();
 	if (session === null) {
 		return {

@@ -22,6 +22,7 @@ import { decodePKIXECDSASignature, decodeSEC1PublicKey, p256, verifyECDSASignatu
 import { sha256 } from "@oslojs/crypto/sha2";
 import { decodePKCS1RSAPublicKey, sha256ObjectIdentifier, verifyRSASSAPKCS1v15Signature } from "@oslojs/crypto/rsa";
 import { get2FARedirect } from "@/lib/server/2fa";
+import { globalPOSTRateLimit } from "@/lib/server/request";
 
 import type { SessionFlags } from "@/lib/server/session";
 import type { AuthenticatorData, ClientData } from "@oslojs/webauthn";
@@ -30,6 +31,11 @@ const throttler = new Throttler<number>([1, 2, 4, 8, 16, 30, 60, 180, 300]);
 const ipBucket = new RefillingTokenBucket<string>(20, 1);
 
 export async function loginAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+	if (!globalPOSTRateLimit()) {
+		return {
+			message: "Too many requests"
+		};
+	}
 	// TODO: Assumes X-Forwarded-For is always included.
 	const clientIP = headers().get("X-Forwarded-For");
 	if (clientIP !== null && !ipBucket.check(clientIP, 1)) {
@@ -96,6 +102,12 @@ export async function loginAction(_prev: ActionResult, formData: FormData): Prom
 }
 
 export async function loginWithPasskeyAction(data: unknown): Promise<ActionResult> {
+	if (!globalPOSTRateLimit()) {
+		return {
+			message: "Too many requests"
+		};
+	}
+
 	const parser = new ObjectParser(data);
 	let encodedAuthenticatorData: string;
 	let encodedClientDataJSON: string;

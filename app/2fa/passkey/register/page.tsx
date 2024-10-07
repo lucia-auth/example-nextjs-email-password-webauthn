@@ -6,8 +6,13 @@ import { get2FARedirect } from "@/lib/server/2fa";
 import { getUserPasskeyCredentials } from "@/lib/server/webauthn";
 import { bigEndian } from "@oslojs/binary";
 import { encodeBase64 } from "@oslojs/encoding";
+import { globalGETRateLimit } from "@/lib/server/request";
 
 export default function Page() {
+	if (!globalGETRateLimit()) {
+		return "Too many requests";
+	}
+
 	const { session, user } = getCurrentSession();
 	if (session === null || user === null) {
 		return redirect("/login");

@@ -4,8 +4,13 @@ import { EmailVerificationForm, ResendEmailVerificationCodeForm } from "./compon
 import { getCurrentSession } from "@/lib/server/session";
 import { redirect } from "next/navigation";
 import { getCurrentUserEmailVerificationRequest } from "@/lib/server/email-verification";
+import { globalGETRateLimit } from "@/lib/server/request";
 
 export default function Page() {
+	if (!globalGETRateLimit()) {
+		return "Too many requests";
+	}
+
 	const { user } = getCurrentSession();
 	if (user === null) {
 		return redirect("/redirect");

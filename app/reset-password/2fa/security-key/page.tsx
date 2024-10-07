@@ -6,8 +6,13 @@ import { redirect } from "next/navigation";
 import { getCurrentPasswordResetSession } from "@/lib/server/password-reset";
 import { getPasswordReset2FARedirect } from "@/lib/server/2fa";
 import { encodeBase64 } from "@oslojs/encoding";
+import { globalGETRateLimit } from "@/lib/server/request";
 
 export default function Page() {
+	if (!globalGETRateLimit()) {
+		return "Too many requests";
+	}
+
 	const { session, user } = getCurrentPasswordResetSession();
 
 	if (session === null) {
@@ -29,7 +34,9 @@ export default function Page() {
 	return (
 		<>
 			<h1>Authenticate with security keys</h1>
-			<Verify2FAWithSecurityKeyButton encodedCredentialIds={credentials.map(credential => encodeBase64(credential.id))}  />
+			<Verify2FAWithSecurityKeyButton
+				encodedCredentialIds={credentials.map((credential) => encodeBase64(credential.id))}
+			/>
 			<Link href="/reset-password/2fa/recovery-code">Use recovery code</Link>
 			{user.registeredTOTP && <Link href="/reset-password/2fa/totp">Use authenticator apps</Link>}
 			{user.registeredPasskey && <Link href="/reset-password/2fa/passkey">Use passkeys</Link>}

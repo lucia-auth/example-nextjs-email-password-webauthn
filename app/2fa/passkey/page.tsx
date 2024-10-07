@@ -6,8 +6,13 @@ import { getCurrentSession } from "@/lib/server/session";
 import { getUserPasskeyCredentials } from "@/lib/server/webauthn";
 import { redirect } from "next/navigation";
 import { encodeBase64 } from "@oslojs/encoding";
+import { globalGETRateLimit } from "@/lib/server/request";
 
 export default function Page() {
+	if (!globalGETRateLimit()) {
+		return "Too many requests";
+	}
+
 	const { session, user } = getCurrentSession();
 	if (session === null || user === null) {
 		return redirect("/login");

@@ -2,13 +2,19 @@
 
 import { recoveryCodeBucket, resetUser2FAWithRecoveryCode } from "@/lib/server/2fa";
 import { getCurrentPasswordResetSession } from "@/lib/server/password-reset";
-
+import { globalPOSTRateLimit } from "@/lib/server/request";
 import { redirect } from "next/navigation";
 
 export async function verifyPasswordReset2FAWithRecoveryCodeAction(
 	_prev: ActionResult,
 	formData: FormData
 ): Promise<ActionResult> {
+	if (!globalPOSTRateLimit()) {
+		return {
+			message: "Too many requests"
+		};
+	}
+
 	const { session, user } = getCurrentPasswordResetSession();
 	if (session === null) {
 		return {

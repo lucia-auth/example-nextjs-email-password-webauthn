@@ -1,7 +1,13 @@
 import { getPasswordReset2FARedirect } from "@/lib/server/2fa";
 import { getCurrentPasswordResetSession } from "@/lib/server/password-reset";
+import { globalGETRateLimit } from "@/lib/server/request";
 
 export async function GET() {
+	if (!globalGETRateLimit()) {
+		return new Response("Too many requests", {
+			status: 429
+		});
+	}
 	const { session, user } = getCurrentPasswordResetSession();
 	if (session === null) {
 		return new Response(null, {

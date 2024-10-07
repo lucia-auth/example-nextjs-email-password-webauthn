@@ -4,11 +4,18 @@ import { setPasswordResetSessionAs2FAVerified, getCurrentPasswordResetSession } 
 import { getUserTOTPKey, totpBucket } from "@/lib/server/totp";
 import { verifyTOTP } from "@oslojs/otp";
 import { redirect } from "next/navigation";
+import { globalPOSTRateLimit } from "@/lib/server/request";
 
 export async function verifyPasswordReset2FAWithTOTPAction(
 	_prev: ActionResult,
 	formData: FormData
 ): Promise<ActionResult> {
+	if (!globalPOSTRateLimit()) {
+		return {
+			message: "Too many requests"
+		};
+	}
+
 	const { session, user } = getCurrentPasswordResetSession();
 	if (session === null) {
 		return {

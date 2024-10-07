@@ -15,10 +15,17 @@ import { getUserSecurityKeyCredential, verifyWebAuthnChallenge } from "@/lib/ser
 import { decodePKIXECDSASignature, decodeSEC1PublicKey, p256, verifyECDSASignature } from "@oslojs/crypto/ecdsa";
 import { sha256 } from "@oslojs/crypto/sha2";
 import { decodePKCS1RSAPublicKey, sha256ObjectIdentifier, verifyRSASSAPKCS1v15Signature } from "@oslojs/crypto/rsa";
+import { globalPOSTRateLimit } from "@/lib/server/request";
 
 import type { AuthenticatorData, ClientData } from "@oslojs/webauthn";
 
 export async function verify2FAWithSecurityKeyAction(data: unknown): Promise<ActionResult> {
+	if (!globalPOSTRateLimit()) {
+		return {
+			error: "Too many requests"
+		};
+	}
+
 	const { session, user } = getCurrentPasswordResetSession();
 	if (session === null || user === null) {
 		return {
@@ -144,7 +151,7 @@ export async function verify2FAWithSecurityKeyAction(data: unknown): Promise<Act
 	setPasswordResetSessionAs2FAVerified(session.id);
 	return {
 		error: null
-	}
+	};
 }
 
 interface ActionResult {

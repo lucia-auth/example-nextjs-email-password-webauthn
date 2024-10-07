@@ -4,8 +4,13 @@ import { get2FARedirect } from "@/lib/server/2fa";
 import { getCurrentSession } from "@/lib/server/session";
 import { getUserRecoverCode } from "@/lib/server/user";
 import { redirect } from "next/navigation";
+import { globalGETRateLimit } from "@/lib/server/request";
 
 export default function Page() {
+	if (!globalGETRateLimit()) {
+		return "Too many requests";
+	}
+
 	const { session, user } = getCurrentSession();
 	if (session === null) {
 		return redirect("/login");

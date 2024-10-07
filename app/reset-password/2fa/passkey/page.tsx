@@ -6,8 +6,13 @@ import { redirect } from "next/navigation";
 import { getCurrentPasswordResetSession } from "@/lib/server/password-reset";
 import { getPasswordReset2FARedirect } from "@/lib/server/2fa";
 import { encodeBase64 } from "@oslojs/encoding";
+import { globalGETRateLimit } from "@/lib/server/request";
 
 export default function Page() {
+	if (!globalGETRateLimit()) {
+		return "Too many requests";
+	}
+
 	const { session, user } = getCurrentPasswordResetSession();
 
 	if (session === null) {

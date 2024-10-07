@@ -16,6 +16,7 @@ import { createPasskeyCredential, getUserPasskeyCredentials, verifyWebAuthnChall
 import { ECDSAPublicKey, p256 } from "@oslojs/crypto/ecdsa";
 import { RSAPublicKey } from "@oslojs/crypto/rsa";
 import { SqliteError } from "better-sqlite3";
+import { globalPOSTRateLimit } from "@/lib/server/request";
 
 import type {
 	AttestationStatement,
@@ -27,6 +28,12 @@ import type {
 import type { WebAuthnUserCredential } from "@/lib/server/webauthn";
 
 export async function registerPasskeyAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+	if (!globalPOSTRateLimit()) {
+		return {
+			message: "Too many requests"
+		};
+	}
+
 	const { session, user } = getCurrentSession();
 	if (session === null || user === null) {
 		return {

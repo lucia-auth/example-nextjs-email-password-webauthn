@@ -14,10 +14,17 @@ import { ExpiringTokenBucket } from "@/lib/server/rate-limit";
 import { getCurrentSession } from "@/lib/server/session";
 import { updateUserEmailAndSetEmailAsVerified } from "@/lib/server/user";
 import { redirect } from "next/navigation";
+import { globalPOSTRateLimit } from "@/lib/server/request";
 
 const bucket = new ExpiringTokenBucket<number>(5, 60 * 30);
 
 export async function verifyEmailAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+	if (!globalPOSTRateLimit()) {
+		return {
+			message: "Too many requests"
+		};
+	}
+
 	const { session, user } = getCurrentSession();
 	if (session === null) {
 		return {
@@ -80,6 +87,12 @@ export async function verifyEmailAction(_prev: ActionResult, formData: FormData)
 }
 
 export async function resendEmailVerificationCodeAction(): Promise<ActionResult> {
+	if (!globalPOSTRateLimit()) {
+		return {
+			message: "Too many requests"
+		};
+	}
+
 	const { session, user } = getCurrentSession();
 	if (session === null) {
 		return {
