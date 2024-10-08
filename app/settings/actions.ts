@@ -24,6 +24,7 @@ import { deleteUserPasskeyCredential, deleteUserSecurityKeyCredential } from "@/
 import { globalPOSTRateLimit } from "@/lib/server/request";
 
 import type { SessionFlags } from "@/lib/server/session";
+import { revalidatePath } from "next/cache";
 
 const passwordUpdateBucket = new ExpiringTokenBucket<string>(5, 60 * 30);
 
@@ -175,6 +176,8 @@ export async function disconnectTOTPAction(): Promise<ActionResult> {
 		};
 	}
 	deleteUserTOTPKey(user.id);
+
+	revalidatePath("/settings");
 	return {
 		message: "Disconnected authenticator app"
 	};
@@ -223,6 +226,8 @@ export async function deletePasskeyAction(_prev: ActionResult, formData: FormDat
 			message: "Invalid credential ID"
 		};
 	}
+
+	revalidatePath("/settings");
 	return {
 		message: "Removed credential"
 	};
@@ -272,6 +277,8 @@ export async function deleteSecurityKeyAction(_prev: ActionResult, formData: For
 			message: "Invalid credential ID"
 		};
 	}
+
+	revalidatePath("/settings");
 	return {
 		message: "Removed credential"
 	};
