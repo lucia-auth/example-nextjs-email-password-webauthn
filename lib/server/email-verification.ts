@@ -85,6 +85,9 @@ export const getCurrentUserEmailVerificationRequest = cache(() => {
 		return null;
 	}
 	const request = getUserEmailVerificationRequest(user.id, id);
+	if (request === null) {
+		deleteEmailVerificationRequestCookie();
+	}
 	return request;
 });
 
