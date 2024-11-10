@@ -74,7 +74,7 @@ export function PasskeyCredentialListItem(props: { encodedId: string; name: stri
 		<li>
 			<p>{props.name}</p>
 			<form action={formAction}>
-				<input type="hidden" name="credential_id" value={props.encodedId} />
+				<input type="hidden" name="credential_id" value={props.encodedId} readOnly />
 				<button> Delete </button>
 				<p>{state.message}</p>
 			</form>
@@ -92,7 +92,7 @@ export function SecurityKeyCredentialListItem(props: { encodedId: string; name: 
 		<li>
 			<p>{props.name}</p>
 			<form action={formAction}>
-				<input type="hidden" name="credential_id" value={props.encodedId} />
+				<input type="hidden" name="credential_id" value={props.encodedId} readOnly />
 				<button> Delete </button>
 				<p>{state.message}</p>
 			</form>

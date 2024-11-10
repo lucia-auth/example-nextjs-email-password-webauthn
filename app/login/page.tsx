@@ -1,4 +1,4 @@
-import { LoginForm } from "./components";
+import { LoginForm, PasskeyLoginButton } from "./components";
 import Link from "next/link";
 
 import { getCurrentSession } from "@/lib/server/session";
@@ -28,6 +28,7 @@ export default function Page() {
 		<>
 			<h1>Sign in</h1>
 			<LoginForm />
+			<PasskeyLoginButton />
 			<Link href="/signup">Create an account</Link>
 			<Link href="/forgot-password">Forgot password?</Link>
 		</>

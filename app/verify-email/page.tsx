@@ -13,7 +13,7 @@ export default function Page() {
 
 	const { user } = getCurrentSession();
 	if (user === null) {
-		return redirect("/redirect");
+		return redirect("/login");
 	}
 
 	// TODO: Ideally we'd sent a new verification email automatically if the previous one is expired,

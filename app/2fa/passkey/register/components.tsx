@@ -78,8 +78,8 @@ export function RegisterPasskeyForm(props: {
 			<form action={action}>
 				<label htmlFor="form-register-credential.name">Credential name</label>
 				<input id="form-register-credential.name" name="name" />
-				<input type="hidden" name="attestation_object" value={encodedAttestationObject ?? ""} />
-				<input type="hidden" name="client_data_json" value={encodedClientDataJSON ?? ""} />
+				<input type="hidden" name="attestation_object" value={encodedAttestationObject ?? ""} readOnly />
+				<input type="hidden" name="client_data_json" value={encodedClientDataJSON ?? ""} readOnly />
 				<button disabled={encodedAttestationObject === null && encodedClientDataJSON === null}>Continue</button>
 				<p>{formState.message}</p>
 			</form>
