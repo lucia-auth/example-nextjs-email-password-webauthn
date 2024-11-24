@@ -6,12 +6,13 @@ import { redirect } from "next/navigation";
 import { getPasswordReset2FARedirect } from "@/lib/server/2fa";
 import { globalGETRateLimit } from "@/lib/server/request";
 
-export default function Page() {
-	if (!globalGETRateLimit()) {
+export default async function Page() {
+	const canPerformRequest = await globalGETRateLimit();
+	if (!canPerformRequest) {
 		return "Too many requests";
 	}
 
-	const { session, user } = getCurrentPasswordResetSession();
+	const { session, user } = await getCurrentPasswordResetSession();
 
 	if (session === null) {
 		return redirect("/forgot-password");

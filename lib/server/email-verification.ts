@@ -55,8 +55,9 @@ export function sendVerificationEmail(email: string, code: string): void {
 	console.log(`To ${email}: Your verification code is ${code}`);
 }
 
-export function setEmailVerificationRequestCookie(request: EmailVerificationRequest): void {
-	cookies().set("email_verification", request.id, {
+export async function setEmailVerificationRequestCookie(request: EmailVerificationRequest): Promise<void> {
+	const cookieStore = await cookies();
+	cookieStore.set("email_verification", request.id, {
 		httpOnly: true,
 		path: "/",
 		secure: process.env.NODE_ENV === "production",
@@ -65,8 +66,9 @@ export function setEmailVerificationRequestCookie(request: EmailVerificationRequ
 	});
 }
 
-export function deleteEmailVerificationRequestCookie(): void {
-	cookies().set("email_verification", "", {
+export async function deleteEmailVerificationRequestCookie(): Promise<void> {
+	const cookieStore = await cookies();
+	cookieStore.set("email_verification", "", {
 		httpOnly: true,
 		path: "/",
 		secure: process.env.NODE_ENV === "production",
@@ -75,18 +77,19 @@ export function deleteEmailVerificationRequestCookie(): void {
 	});
 }
 
-export const getCurrentUserEmailVerificationRequest = cache(() => {
-	const { user } = getCurrentSession();
+export const getCurrentUserEmailVerificationRequest = cache(async () => {
+	const { user } = await getCurrentSession();
 	if (user === null) {
 		return null;
 	}
-	const id = cookies().get("email_verification")?.value ?? null;
+	const cookieStore = await cookies();
+	const id = cookieStore.get("email_verification")?.value ?? null;
 	if (id === null) {
 		return null;
 	}
 	const request = getUserEmailVerificationRequest(user.id, id);
 	if (request === null) {
-		deleteEmailVerificationRequestCookie();
+		await deleteEmailVerificationRequestCookie();
 	}
 	return request;
 });

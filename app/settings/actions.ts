@@ -28,13 +28,14 @@ import type { SessionFlags } from "@/lib/server/session";
 const passwordUpdateBucket = new ExpiringTokenBucket<string>(5, 60 * 30);
 
 export async function updatePasswordAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-	if (!globalPOSTRateLimit()) {
+	const canPerformRequest = await globalPOSTRateLimit();
+	if (!canPerformRequest) {
 		return {
 			message: "Too many requests"
 		};
 	}
 
-	const { session, user } = getCurrentSession();
+	const { session, user } = await getCurrentSession();
 	if (session === null) {
 		return {
 			message: "Not authenticated"
@@ -85,20 +86,21 @@ export async function updatePasswordAction(_prev: ActionResult, formData: FormDa
 		twoFactorVerified: session.twoFactorVerified
 	};
 	const newSession = createSession(sessionToken, user.id, sessionFlags);
-	setSessionTokenCookie(sessionToken, newSession.expiresAt);
+	await setSessionTokenCookie(sessionToken, newSession.expiresAt);
 	return {
 		message: "Updated password"
 	};
 }
 
 export async function updateEmailAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-	if (!globalPOSTRateLimit()) {
+	const canPerformRequest = await globalPOSTRateLimit();
+	if (!canPerformRequest) {
 		return {
 			message: "Too many requests"
 		};
 	}
 
-	const { session, user } = getCurrentSession();
+	const { session, user } = await getCurrentSession();
 	if (session === null) {
 		return {
 			message: "Not authenticated"
@@ -142,18 +144,19 @@ export async function updateEmailAction(_prev: ActionResult, formData: FormData)
 	}
 	const verificationRequest = createEmailVerificationRequest(user.id, email);
 	sendVerificationEmail(verificationRequest.email, verificationRequest.code);
-	setEmailVerificationRequestCookie(verificationRequest);
+	await setEmailVerificationRequestCookie(verificationRequest);
 	return redirect("/verify-email");
 }
 
 export async function disconnectTOTPAction(): Promise<ActionResult> {
-	if (!globalPOSTRateLimit()) {
+	const canPerformRequest = await globalPOSTRateLimit();
+	if (!canPerformRequest) {
 		return {
 			message: "Too many requests"
 		};
 	}
 
-	const { session, user } = getCurrentSession();
+	const { session, user } = await getCurrentSession();
 	if (session === null || user === null) {
 		return {
 			message: "Not authenticated"
@@ -181,13 +184,14 @@ export async function disconnectTOTPAction(): Promise<ActionResult> {
 }
 
 export async function deletePasskeyAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-	if (!globalPOSTRateLimit()) {
+	const canPerformRequest = await globalPOSTRateLimit();
+	if (!canPerformRequest) {
 		return {
 			message: "Too many requests"
 		};
 	}
 
-	const { session, user } = getCurrentSession();
+	const { session, user } = await getCurrentSession();
 	if (session === null || user === null) {
 		return {
 			message: "Not authenticated"
@@ -229,13 +233,14 @@ export async function deletePasskeyAction(_prev: ActionResult, formData: FormDat
 }
 
 export async function deleteSecurityKeyAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-	if (!globalPOSTRateLimit()) {
+	const canPerformRequest = await globalPOSTRateLimit();
+	if (!canPerformRequest) {
 		return {
 			message: "Too many requests"
 		};
 	}
 
-	const { session, user } = getCurrentSession();
+	const { session, user } = await getCurrentSession();
 	if (session === null || user === null) {
 		return {
 			message: "Not authenticated"
@@ -278,14 +283,15 @@ export async function deleteSecurityKeyAction(_prev: ActionResult, formData: For
 }
 
 export async function regenerateRecoveryCodeAction(): Promise<RegenerateRecoveryCodeActionResult> {
-	if (!globalPOSTRateLimit()) {
+	const canPerformRequest = await globalPOSTRateLimit();
+	if (!canPerformRequest) {
 		return {
 			error: "Too many requests",
 			recoveryCode: null
 		};
 	}
 
-	const { session, user } = getCurrentSession();
+	const { session, user } = await getCurrentSession();
 	if (session === null || user === null) {
 		return {
 			error: "Not authenticated",

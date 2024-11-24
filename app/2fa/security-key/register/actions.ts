@@ -32,13 +32,14 @@ import type {
 import type { WebAuthnUserCredential } from "@/lib/server/webauthn";
 
 export async function registerSecurityKeyAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-	if (!globalPOSTRateLimit()) {
+	const canPerformRequest = await globalPOSTRateLimit();
+	if (!canPerformRequest) {
 		return {
 			message: "Too many requests"
 		};
 	}
 
-	const { session, user } = getCurrentSession();
+	const { session, user } = await getCurrentSession();
 	if (session === null || user === null) {
 		return {
 			message: "Not authenticated"

@@ -6,13 +6,14 @@ import { globalPOSTRateLimit } from "@/lib/server/request";
 import { redirect } from "next/navigation";
 
 export async function reset2FAAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-	if (!globalPOSTRateLimit()) {
+	const canPerformRequest = await globalPOSTRateLimit();
+	if (!canPerformRequest) {
 		return {
 			message: "Too many requests"
 		};
 	}
 
-	const { session, user } = getCurrentSession();
+	const { session, user } = await getCurrentSession();
 	if (session === null) {
 		return {
 			message: "Not authenticated"

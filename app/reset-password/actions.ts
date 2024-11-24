@@ -19,13 +19,14 @@ import { globalPOSTRateLimit } from "@/lib/server/request";
 import type { SessionFlags } from "@/lib/server/session";
 
 export async function resetPasswordAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-	if (!globalPOSTRateLimit()) {
+	const canPerformRequest = await globalPOSTRateLimit();
+	if (!canPerformRequest) {
 		return {
 			message: "Too many requests"
 		};
 	}
 
-	const { session: passwordResetSession, user } = getCurrentPasswordResetSession();
+	const { session: passwordResetSession, user } = await getCurrentPasswordResetSession();
 	if (passwordResetSession === null) {
 		return {
 			message: "Not authenticated"
@@ -64,8 +65,8 @@ export async function resetPasswordAction(_prev: ActionResult, formData: FormDat
 	};
 	const sessionToken = generateSessionToken();
 	const session = createSession(sessionToken, user.id, sessionFlags);
-	setSessionTokenCookie(sessionToken, session.expiresAt);
-	deletePasswordResetSessionTokenCookie();
+	await setSessionTokenCookie(sessionToken, session.expiresAt);
+	await deletePasswordResetSessionTokenCookie();
 	return redirect("/");
 }
 

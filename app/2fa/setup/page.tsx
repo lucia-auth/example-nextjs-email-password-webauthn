@@ -4,12 +4,13 @@ import { getCurrentSession } from "@/lib/server/session";
 import { redirect } from "next/navigation";
 import { globalGETRateLimit } from "@/lib/server/request";
 
-export default function Page() {
-	if (!globalGETRateLimit()) {
+export default async function Page() {
+	const canPerformRequest = await globalGETRateLimit();
+	if (!canPerformRequest) {
 		return "Too many requests";
 	}
 
-	const { session, user } = getCurrentSession();
+	const { session, user } = await getCurrentSession();
 	if (session === null || user === null) {
 		return redirect("/login");
 	}

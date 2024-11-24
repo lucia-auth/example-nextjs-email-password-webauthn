@@ -20,13 +20,14 @@ import { globalPOSTRateLimit } from "@/lib/server/request";
 import type { AuthenticatorData, ClientData } from "@oslojs/webauthn";
 
 export async function verify2FAWithSecurityKeyAction(data: unknown): Promise<ActionResult> {
-	if (!globalPOSTRateLimit()) {
+	const canPerformRequest = await globalPOSTRateLimit();
+	if (!canPerformRequest) {
 		return {
 			error: "Too many requests"
 		};
 	}
 
-	const { session, user } = getCurrentSession();
+	const { session, user } = await getCurrentSession();
 	if (session === null || user === null) {
 		return {
 			error: "Not authenticated"

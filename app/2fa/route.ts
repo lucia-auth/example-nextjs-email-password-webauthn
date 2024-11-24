@@ -3,12 +3,13 @@ import { globalGETRateLimit } from "@/lib/server/request";
 import { getCurrentSession } from "@/lib/server/session";
 
 export async function GET() {
-	if (!globalGETRateLimit()) {
+	const canPerformRequest = await globalGETRateLimit();
+	if (!canPerformRequest) {
 		return new Response("Too many requests", {
 			status: 429
 		});
 	}
-	const { session, user } = getCurrentSession();
+	const { session, user } = await getCurrentSession();
 	if (session === null || user === null) {
 		return new Response(null, {
 			status: 302,

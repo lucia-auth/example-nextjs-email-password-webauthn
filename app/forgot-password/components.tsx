@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormState } from "react-dom";
+import { useActionState } from "react";
 import { forgotPasswordAction } from "./actions";
 
 const initialForgotPasswordState = {
@@ -8,7 +8,7 @@ const initialForgotPasswordState = {
 };
 
 export function ForgotPasswordForm() {
-	const [state, action] = useFormState(forgotPasswordAction, initialForgotPasswordState);
+	const [state, action] = useActionState(forgotPasswordAction, initialForgotPasswordState);
 	return (
 		<form action={action}>
 			<label htmlFor="form-forgot.email">Email</label>

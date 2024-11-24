@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormState } from "react-dom";
+import { useActionState } from "react";
 import { resetPasswordAction } from "./actions";
 
 const initialPasswordResetState = {
@@ -8,7 +8,7 @@ const initialPasswordResetState = {
 };
 
 export function PasswordResetForm() {
-	const [state, action] = useFormState(resetPasswordAction, initialPasswordResetState);
+	const [state, action] = useActionState(resetPasswordAction, initialPasswordResetState);
 	return (
 		<form action={action}>
 			<label htmlFor="form-reset.password">Password</label>

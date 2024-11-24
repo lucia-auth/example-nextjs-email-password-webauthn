@@ -8,13 +8,14 @@ import { redirect } from "next/navigation";
 import { globalPOSTRateLimit } from "@/lib/server/request";
 
 export async function verify2FAAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-	if (!globalPOSTRateLimit()) {
+	const canPerformRequest = await globalPOSTRateLimit();
+	if (!canPerformRequest) {
 		return {
 			message: "Too many requests"
 		};
 	}
 
-	const { session, user } = getCurrentSession();
+	const { session, user } = await getCurrentSession();
 	if (session === null) {
 		return {
 			message: "Not authenticated"

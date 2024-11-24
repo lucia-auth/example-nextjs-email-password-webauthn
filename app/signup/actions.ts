@@ -19,14 +19,16 @@ import type { SessionFlags } from "@/lib/server/session";
 const ipBucket = new RefillingTokenBucket<string>(3, 10);
 
 export async function signupAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-	if (!globalPOSTRateLimit()) {
+	const canPerformRequest = await globalPOSTRateLimit();
+	if (!canPerformRequest) {
 		return {
 			message: "Too many requests"
 		};
 	}
 
 	// TODO: Assumes X-Forwarded-For is always included.
-	const clientIP = headers().get("X-Forwarded-For");
+	const headersList = await headers();
+	const clientIP = headersList.get("X-Forwarded-For");
 	if (clientIP !== null && !ipBucket.check(clientIP, 1)) {
 		return {
 			message: "Too many requests"
@@ -76,14 +78,14 @@ export async function signupAction(_prev: ActionResult, formData: FormData): Pro
 	const user = await createUser(email, username, password);
 	const emailVerificationRequest = createEmailVerificationRequest(user.id, user.email);
 	sendVerificationEmail(emailVerificationRequest.email, emailVerificationRequest.code);
-	setEmailVerificationRequestCookie(emailVerificationRequest);
+	await setEmailVerificationRequestCookie(emailVerificationRequest);
 
 	const sessionFlags: SessionFlags = {
 		twoFactorVerified: false
 	};
 	const sessionToken = generateSessionToken();
 	const session = createSession(sessionToken, user.id, sessionFlags);
-	setSessionTokenCookie(sessionToken, session.expiresAt);
+	await setSessionTokenCookie(sessionToken, session.expiresAt);
 	return redirect("/2fa/setup");
 }
 

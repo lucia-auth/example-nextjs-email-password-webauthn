@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormState } from "react-dom";
+import { useActionState } from "react";
 import { verifyPasswordResetEmailAction } from "./actions";
 
 const initialPasswordResetEmailVerificationState = {
@@ -8,7 +8,7 @@ const initialPasswordResetEmailVerificationState = {
 };
 
 export function PasswordResetEmailVerificationForm() {
-	const [state, action] = useFormState(verifyPasswordResetEmailAction, initialPasswordResetEmailVerificationState);
+	const [state, action] = useActionState(verifyPasswordResetEmailAction, initialPasswordResetEmailVerificationState);
 	return (
 		<form action={action}>
 			<label htmlFor="form-verify.code">Code</label>

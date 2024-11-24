@@ -56,8 +56,9 @@ WHERE session.id = ?
 	return { session, user };
 }
 
-export const getCurrentSession = cache((): SessionValidationResult => {
-	const token = cookies().get("session")?.value ?? null;
+export const getCurrentSession = cache(async (): Promise<SessionValidationResult> => {
+	const cookieStore = await cookies();
+	const token = cookieStore.get("session")?.value ?? null;
 	if (token === null) {
 		return { session: null, user: null };
 	}
@@ -73,8 +74,9 @@ export function invalidateUserSessions(userId: number): void {
 	db.execute("DELETE FROM session WHERE user_id = ?", [userId]);
 }
 
-export function setSessionTokenCookie(token: string, expiresAt: Date): void {
-	cookies().set("session", token, {
+export async function setSessionTokenCookie(token: string, expiresAt: Date): Promise<void> {
+	const cookieStore = await cookies();
+	cookieStore.set("session", token, {
 		httpOnly: true,
 		path: "/",
 		secure: process.env.NODE_ENV === "production",
@@ -83,8 +85,9 @@ export function setSessionTokenCookie(token: string, expiresAt: Date): void {
 	});
 }
 
-export function deleteSessionTokenCookie(): void {
-	cookies().set("session", "", {
+export async function deleteSessionTokenCookie(): Promise<void> {
+	const cookieStore = await cookies();
+	cookieStore.set("session", "", {
 		httpOnly: true,
 		path: "/",
 		secure: process.env.NODE_ENV === "production",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormState } from "react-dom";
+import { useActionState } from "react";
 import { verifyPasswordReset2FAWithTOTPAction } from "./actions";
 
 const initialPasswordResetTOTPState = {
@@ -8,7 +8,7 @@ const initialPasswordResetTOTPState = {
 };
 
 export function PasswordResetTOTPForm() {
-	const [state, action] = useFormState(verifyPasswordReset2FAWithTOTPAction, initialPasswordResetTOTPState);
+	const [state, action] = useActionState(verifyPasswordReset2FAWithTOTPAction, initialPasswordResetTOTPState);
 	return (
 		<form action={action}>
 			<label htmlFor="form-totp.code">Code</label>

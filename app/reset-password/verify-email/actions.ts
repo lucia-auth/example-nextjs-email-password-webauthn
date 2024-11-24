@@ -9,13 +9,14 @@ import { globalPOSTRateLimit } from "@/lib/server/request";
 const emailVerificationBucket = new ExpiringTokenBucket<number>(5, 60 * 30);
 
 export async function verifyPasswordResetEmailAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-	if (!globalPOSTRateLimit()) {
+	const canPerformRequest = await globalPOSTRateLimit();
+	if (!canPerformRequest) {
 		return {
 			message: "Too many requests"
 		};
 	}
 
-	const { session } = getCurrentPasswordResetSession();
+	const { session } = await getCurrentPasswordResetSession();
 	if (session === null) {
 		return {
 			message: "Not authenticated"

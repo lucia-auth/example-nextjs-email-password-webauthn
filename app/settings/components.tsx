@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import {
 	deletePasskeyAction,
 	deleteSecurityKeyAction,
@@ -9,14 +9,13 @@ import {
 	updateEmailAction,
 	updatePasswordAction
 } from "./actions";
-import { useFormState } from "react-dom";
 
 const initialUpdatePasswordState = {
 	message: ""
 };
 
 export function UpdatePasswordForm() {
-	const [state, action] = useFormState(updatePasswordAction, initialUpdatePasswordState);
+	const [state, action] = useActionState(updatePasswordAction, initialUpdatePasswordState);
 
 	return (
 		<form action={action}>
@@ -37,7 +36,7 @@ const initialUpdateFormState = {
 };
 
 export function UpdateEmailForm() {
-	const [state, action] = useFormState(updateEmailAction, initialUpdateFormState);
+	const [state, action] = useActionState(updateEmailAction, initialUpdateFormState);
 
 	return (
 		<form action={action}>
@@ -55,7 +54,7 @@ const initialDisconnectTOTPState = {
 };
 
 export function DisconnectTOTPButton() {
-	const [state, formAction] = useFormState(disconnectTOTPAction, initialDisconnectTOTPState);
+	const [state, formAction] = useActionState(disconnectTOTPAction, initialDisconnectTOTPState);
 	return (
 		<form action={formAction}>
 			<button>Disconnect</button>
@@ -69,7 +68,7 @@ const initialPasskeyState = {
 };
 
 export function PasskeyCredentialListItem(props: { encodedId: string; name: string }) {
-	const [state, formAction] = useFormState(deletePasskeyAction, initialPasskeyState);
+	const [state, formAction] = useActionState(deletePasskeyAction, initialPasskeyState);
 	return (
 		<li>
 			<p>{props.name}</p>
@@ -87,7 +86,7 @@ const initialSecurityKeyState = {
 };
 
 export function SecurityKeyCredentialListItem(props: { encodedId: string; name: string }) {
-	const [state, formAction] = useFormState(deleteSecurityKeyAction, initialSecurityKeyState);
+	const [state, formAction] = useActionState(deleteSecurityKeyAction, initialSecurityKeyState);
 	return (
 		<li>
 			<p>{props.name}</p>

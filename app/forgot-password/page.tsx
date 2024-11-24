@@ -3,8 +3,9 @@ import Link from "next/link";
 
 import { globalGETRateLimit } from "@/lib/server/request";
 
-export default function Page() {
-	if (!globalGETRateLimit()) {
+export default async function Page() {
+	const canPerformRequest = await globalGETRateLimit();
+	if (!canPerformRequest) {
 		return "Too many requests";
 	}
 

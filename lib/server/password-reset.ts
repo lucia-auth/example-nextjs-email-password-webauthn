@@ -84,20 +84,22 @@ export function invalidateUserPasswordResetSessions(userId: number): void {
 	db.execute("DELETE FROM password_reset_session WHERE user_id = ?", [userId]);
 }
 
-export const getCurrentPasswordResetSession = cache(() => {
-	const token = cookies().get("password_reset_session")?.value ?? null;
+export const getCurrentPasswordResetSession = cache(async () => {
+	const cookieStore = await cookies();
+	const token = cookieStore.get("password_reset_session")?.value ?? null;
 	if (token === null) {
 		return { session: null, user: null };
 	}
 	const result = validatePasswordResetSessionToken(token);
 	if (result.session === null) {
-		deletePasswordResetSessionTokenCookie();
+		await deletePasswordResetSessionTokenCookie();
 	}
 	return result;
 });
 
-export function setPasswordResetSessionTokenCookie(token: string, expiresAt: Date): void {
-	cookies().set("password_reset_session", token, {
+export async function setPasswordResetSessionTokenCookie(token: string, expiresAt: Date): Promise<void> {
+	const cookieStore = await cookies();
+	cookieStore.set("password_reset_session", token, {
 		expires: expiresAt,
 		sameSite: "lax",
 		httpOnly: true,
@@ -106,8 +108,9 @@ export function setPasswordResetSessionTokenCookie(token: string, expiresAt: Dat
 	});
 }
 
-export function deletePasswordResetSessionTokenCookie(): void {
-	cookies().set("password_reset_session", "", {
+export async function deletePasswordResetSessionTokenCookie(): Promise<void> {
+	const cookieStore = await cookies();
+	cookieStore.set("password_reset_session", "", {
 		maxAge: 0,
 		sameSite: "lax",
 		httpOnly: true,

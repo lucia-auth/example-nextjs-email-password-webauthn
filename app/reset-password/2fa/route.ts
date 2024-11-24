@@ -3,12 +3,13 @@ import { getCurrentPasswordResetSession } from "@/lib/server/password-reset";
 import { globalGETRateLimit } from "@/lib/server/request";
 
 export async function GET() {
-	if (!globalGETRateLimit()) {
+	const canPerformRequest = await globalGETRateLimit();
+	if (!canPerformRequest) {
 		return new Response("Too many requests", {
 			status: 429
 		});
 	}
-	const { session, user } = getCurrentPasswordResetSession();
+	const { session, user } = await getCurrentPasswordResetSession();
 	if (session === null) {
 		return new Response(null, {
 			status: 302,

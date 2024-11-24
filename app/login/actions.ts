@@ -31,13 +31,15 @@ const throttler = new Throttler<number>([1, 2, 4, 8, 16, 30, 60, 180, 300]);
 const ipBucket = new RefillingTokenBucket<string>(20, 1);
 
 export async function loginAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-	if (!globalPOSTRateLimit()) {
+	const canPerformRequest = await globalPOSTRateLimit();
+	if (!canPerformRequest) {
 		return {
 			message: "Too many requests"
 		};
 	}
 	// TODO: Assumes X-Forwarded-For is always included.
-	const clientIP = headers().get("X-Forwarded-For");
+	const headersList = await headers();
+	const clientIP = headersList.get("X-Forwarded-For");
 	if (clientIP !== null && !ipBucket.check(clientIP, 1)) {
 		return {
 			message: "Too many requests"
@@ -90,7 +92,7 @@ export async function loginAction(_prev: ActionResult, formData: FormData): Prom
 	};
 	const sessionToken = generateSessionToken();
 	const session = createSession(sessionToken, user.id, sessionFlags);
-	setSessionTokenCookie(sessionToken, session.expiresAt);
+	await setSessionTokenCookie(sessionToken, session.expiresAt);
 
 	if (!user.emailVerified) {
 		return redirect("/verify-email");
@@ -102,7 +104,8 @@ export async function loginAction(_prev: ActionResult, formData: FormData): Prom
 }
 
 export async function loginWithPasskeyAction(data: unknown): Promise<ActionResult> {
-	if (!globalPOSTRateLimit()) {
+	const canPerformRequest = await globalPOSTRateLimit();
+	if (!canPerformRequest) {
 		return {
 			message: "Too many requests"
 		};
@@ -222,7 +225,7 @@ export async function loginWithPasskeyAction(data: unknown): Promise<ActionResul
 	};
 	const sessionToken = generateSessionToken();
 	const session = createSession(sessionToken, credential.userId, sessionFlags);
-	setSessionTokenCookie(sessionToken, session.expiresAt);
+	await setSessionTokenCookie(sessionToken, session.expiresAt);
 	return redirect("/");
 }
 

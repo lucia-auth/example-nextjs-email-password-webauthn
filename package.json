@@ -3,7 +3,7 @@
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
-		"dev": "next dev",
+		"dev": "next dev --turbopack",
 		"build": "next build",
 		"start": "next start",
 		"lint": "next lint",
@@ -19,20 +19,21 @@
 		"@pilcrowjs/db-query": "^0.0.2",
 		"@pilcrowjs/object-parser": "^0.0.4",
 		"better-sqlite3": "^11.3.0",
-		"next": "14.2.14",
-		"react": "^18",
-		"react-dom": "^18",
+		"next": "15.0.3",
+		"react": "19.0.0-rc-66855b96-20241106",
+		"react-dom": "19.0.0-rc-66855b96-20241106",
 		"uqr": "^0.1.2"
 	},
 	"devDependencies": {
 		"@types/better-sqlite3": "^7.6.11",
 		"@types/node": "^20",
-		"@types/react": "^18",
-		"@types/react-dom": "^18",
+		"@types/react": "npm:types-react@19.0.0-rc.1",
+		"@types/react-dom": "npm:types-react-dom@19.0.0-rc.1",
 		"eslint": "^8",
-		"eslint-config-next": "14.2.14",
+		"eslint-config-next": "15.0.3",
 		"eslint-config-prettier": "^9.1.0",
 		"prettier": "^3.3.3",
 		"typescript": "^5"
-	}
+	},
+	"packageManager": "pnpm@9.14.2+sha512.6e2baf77d06b9362294152c851c4f278ede37ab1eba3a55fda317a4a17b209f4dbb973fb250a77abc463a341fcb1f17f17cfa24091c4eb319cda0d9b84278387"
 }

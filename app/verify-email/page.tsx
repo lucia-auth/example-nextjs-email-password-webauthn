@@ -6,19 +6,20 @@ import { redirect } from "next/navigation";
 import { getCurrentUserEmailVerificationRequest } from "@/lib/server/email-verification";
 import { globalGETRateLimit } from "@/lib/server/request";
 
-export default function Page() {
-	if (!globalGETRateLimit()) {
+export default async function Page() {
+	const canPerformRequest = await globalGETRateLimit();
+	if (!canPerformRequest) {
 		return "Too many requests";
 	}
 
-	const { user } = getCurrentSession();
+	const { user } = await getCurrentSession();
 	if (user === null) {
 		return redirect("/redirect");
 	}
 
 	// TODO: Ideally we'd sent a new verification email automatically if the previous one is expired,
 	// but we can't set cookies inside server components.
-	const verificationRequest = getCurrentUserEmailVerificationRequest();
+	const verificationRequest = await getCurrentUserEmailVerificationRequest();
 	if (verificationRequest === null && user.emailVerified) {
 		return redirect("/");
 	}

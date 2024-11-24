@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import { loginAction, loginWithPasskeyAction } from "./actions";
-import { useFormState } from "react-dom";
 import { encodeBase64 } from "@oslojs/encoding";
 import { createChallenge } from "@/lib/client/webauthn";
 
@@ -11,7 +10,7 @@ const initialState = {
 };
 
 export function LoginForm() {
-	const [state, action] = useFormState(loginAction, initialState);
+	const [state, action] = useActionState(loginAction, initialState);
 
 	return (
 		<form action={action}>

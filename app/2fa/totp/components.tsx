@@ -1,14 +1,14 @@
 "use client";
 
 import { verify2FAAction } from "./actions";
-import { useFormState } from "react-dom";
+import { useActionState } from "react";
 
 const initial2FAVerificationState = {
 	message: ""
 };
 
 export function TwoFactorVerificationForm() {
-	const [state, action] = useFormState(verify2FAAction, initial2FAVerificationState);
+	const [state, action] = useActionState(verify2FAAction, initial2FAVerificationState);
 	return (
 		<form action={action}>
 			<label htmlFor="form-totp.code">Code</label>

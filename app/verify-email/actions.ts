@@ -19,13 +19,14 @@ import { globalPOSTRateLimit } from "@/lib/server/request";
 const bucket = new ExpiringTokenBucket<number>(5, 60 * 30);
 
 export async function verifyEmailAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-	if (!globalPOSTRateLimit()) {
+	const canPerformRequest = await globalPOSTRateLimit();
+	if (!canPerformRequest) {
 		return {
 			message: "Too many requests"
 		};
 	}
 
-	const { session, user } = getCurrentSession();
+	const { session, user } = await getCurrentSession();
 	if (session === null) {
 		return {
 			message: "Not authenticated"
@@ -42,7 +43,7 @@ export async function verifyEmailAction(_prev: ActionResult, formData: FormData)
 		};
 	}
 
-	let verificationRequest = getCurrentUserEmailVerificationRequest();
+	let verificationRequest = await getCurrentUserEmailVerificationRequest();
 	if (verificationRequest === null) {
 		return {
 			message: "Not authenticated"
@@ -79,7 +80,7 @@ export async function verifyEmailAction(_prev: ActionResult, formData: FormData)
 	deleteUserEmailVerificationRequest(user.id);
 	invalidateUserPasswordResetSessions(user.id);
 	updateUserEmailAndSetEmailAsVerified(user.id, verificationRequest.email);
-	deleteEmailVerificationRequestCookie();
+	await deleteEmailVerificationRequestCookie();
 	if (!user.registered2FA) {
 		return redirect("/2fa/setup");
 	}
@@ -87,13 +88,14 @@ export async function verifyEmailAction(_prev: ActionResult, formData: FormData)
 }
 
 export async function resendEmailVerificationCodeAction(): Promise<ActionResult> {
-	if (!globalPOSTRateLimit()) {
+	const canPerformRequest = await globalPOSTRateLimit();
+	if (!canPerformRequest) {
 		return {
 			message: "Too many requests"
 		};
 	}
 
-	const { session, user } = getCurrentSession();
+	const { session, user } = await getCurrentSession();
 	if (session === null) {
 		return {
 			message: "Not authenticated"
@@ -109,7 +111,7 @@ export async function resendEmailVerificationCodeAction(): Promise<ActionResult>
 			message: "Too many requests"
 		};
 	}
-	let verificationRequest = getCurrentUserEmailVerificationRequest();
+	let verificationRequest = await getCurrentUserEmailVerificationRequest();
 	if (verificationRequest === null) {
 		if (user.emailVerified) {
 			return {
@@ -131,7 +133,7 @@ export async function resendEmailVerificationCodeAction(): Promise<ActionResult>
 		verificationRequest = createEmailVerificationRequest(user.id, verificationRequest.email);
 	}
 	sendVerificationEmail(verificationRequest.email, verificationRequest.code);
-	setEmailVerificationRequestCookie(verificationRequest);
+	await setEmailVerificationRequestCookie(verificationRequest);
 	return {
 		message: "A new code was sent to your inbox."
 	};

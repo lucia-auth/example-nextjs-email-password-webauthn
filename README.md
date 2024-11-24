@@ -17,11 +17,12 @@ Emails are just logged to the console. Rate limiting is implemented using JavaSc
 
 Create `sqlite.db` and run `setup.sql`.
 
-```
+```bash
 sqlite3 sqlite.db
+.read setup.sql
 ```
 
-Create a .env file. Generate a 128 bit (16 byte) string, base64 encode it, and set it as `ENCRYPTION_KEY`.
+Create a `.env` file. Generate a 128 bit (16 byte) string, base64 encode it, and set it as `ENCRYPTION_KEY`.
 
 ```bash
 ENCRYPTION_KEY="L9pmqRJnO1ZJSQ2svbHuBA=="
@@ -30,12 +31,12 @@ ENCRYPTION_KEY="L9pmqRJnO1ZJSQ2svbHuBA=="
 > You can use OpenSSL to quickly generate a secure key.
 >
 > ```bash
-> openssl rand --base64 16
+> openssl rand -base64 16
 > ```
 
 Install dependencies and run the application:
 
-```
+```bash
 pnpm i
 pnpm dev
 ```

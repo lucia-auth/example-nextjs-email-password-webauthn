@@ -18,14 +18,16 @@ const passwordResetEmailIPBucket = new RefillingTokenBucket<string>(3, 60);
 const passwordResetEmailUserBucket = new RefillingTokenBucket<number>(3, 60);
 
 export async function forgotPasswordAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-	if (!globalPOSTRateLimit()) {
+	const canPerformRequest = await globalPOSTRateLimit();
+	if (!canPerformRequest) {
 		return {
 			message: "Too many requests"
 		};
 	}
 
 	// TODO: Assumes X-Forwarded-For is always included.
-	const clientIP = headers().get("X-Forwarded-For");
+	const headersList = await headers();
+	const clientIP = headersList.get("X-Forwarded-For");
 	if (clientIP !== null && !passwordResetEmailIPBucket.check(clientIP, 1)) {
 		return {
 			message: "Too many requests"
@@ -64,7 +66,7 @@ export async function forgotPasswordAction(_prev: ActionResult, formData: FormDa
 	const session = createPasswordResetSession(sessionToken, user.id, user.email);
 
 	sendPasswordResetEmail(session.email, session.code);
-	setPasswordResetSessionTokenCookie(sessionToken, session.expiresAt);
+	await setPasswordResetSessionTokenCookie(sessionToken, session.expiresAt);
 	return redirect("/reset-password/verify-email");
 }
 

@@ -8,12 +8,13 @@ import { renderSVG } from "uqr";
 import { get2FARedirect } from "@/lib/server/2fa";
 import { globalGETRateLimit } from "@/lib/server/request";
 
-export default function Page() {
-	if (!globalGETRateLimit()) {
+export default async function Page() {
+	const canPerformRequest = await globalGETRateLimit();
+	if (!canPerformRequest) {
 		return "Too many requests";
 	}
 
-	const { session, user } = getCurrentSession();
+	const { session, user } = await getCurrentSession();
 	if (session === null) {
 		return redirect("/login");
 	}

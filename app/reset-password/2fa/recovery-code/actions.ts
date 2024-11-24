@@ -9,13 +9,14 @@ export async function verifyPasswordReset2FAWithRecoveryCodeAction(
 	_prev: ActionResult,
 	formData: FormData
 ): Promise<ActionResult> {
-	if (!globalPOSTRateLimit()) {
+	const canPerformRequest = await globalPOSTRateLimit();
+	if (!canPerformRequest) {
 		return {
 			message: "Too many requests"
 		};
 	}
 
-	const { session, user } = getCurrentPasswordResetSession();
+	const { session, user } = await getCurrentPasswordResetSession();
 	if (session === null) {
 		return {
 			message: "Not authenticated"

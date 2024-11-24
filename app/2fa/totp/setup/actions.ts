@@ -11,13 +11,14 @@ import { globalPOSTRateLimit } from "@/lib/server/request";
 const totpUpdateBucket = new RefillingTokenBucket<number>(3, 60 * 10);
 
 export async function setup2FAAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
-	if (!globalPOSTRateLimit()) {
+	const canPerformRequest = await globalPOSTRateLimit();
+	if (!canPerformRequest) {
 		return {
 			message: "Too many requests"
 		};
 	}
 
-	const { session, user } = getCurrentSession();
+	const { session, user } = await getCurrentSession();
 	if (session === null) {
 		return {
 			message: "Not authenticated"

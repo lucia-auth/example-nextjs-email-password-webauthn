@@ -1,14 +1,14 @@
 "use client";
 
 import { setup2FAAction } from "./actions";
-import { useFormState } from "react-dom";
+import { useActionState } from "react";
 
 const initial2FASetUpState = {
 	message: ""
 };
 
 export function TwoFactorSetUpForm(props: { encodedTOTPKey: string }) {
-	const [state, action] = useFormState(setup2FAAction, initial2FASetUpState);
+	const [state, action] = useActionState(setup2FAAction, initial2FASetUpState);
 	return (
 		<form action={action}>
 			<input name="key" value={props.encodedTOTPKey} hidden required />
